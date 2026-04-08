@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "authenticatedLogo.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
