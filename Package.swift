@@ -17,7 +17,7 @@ let package = Package(
         .binaryTarget(
             name: "Loop8AuthSDK",
             url: "https://github.com/l8p8/loop8-auth-ios/releases/download/0.1.0/Loop8AuthSDK.xcframework.zip",
-            checksum: "a41578084dd805e0a094efd1370d04046085718cddc785a50b4e9a214673d40f"
+            checksum: "256d07fa88412bbff22988180fd4975b433cc58eb7939559494f1802719664ec"
         )
     ]
 )

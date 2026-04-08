@@ -12,9 +12,8 @@ The official iOS SDK for integrating Loop8 authentication into your app.
 2. [Configure the SDK](#2-configure-the-sdk)
 3. [Handle the login callback](#3-handle-the-login-callback)
 4. [Add the login button](#4-add-the-login-button)
-5. [Handle logout](#5-handle-logout)
-6. [Required Info.plist settings](#6-required-infoplist-settings)
-7. [Example app](#7-example-app)
+5. [Required Info.plist settings](#5-required-infoplist-settings)
+6. [Example app](#6-example-app)
 
 ---
 
@@ -39,6 +38,8 @@ In Xcode:
 
 Configure the SDK as early as possible — inside your `App` initializer or `AppDelegate`.
 
+#### SwiftUI
+
 ```swift
 import SwiftUI
 import Loop8AuthSDK
@@ -49,14 +50,13 @@ struct MyApp: App {
     init() {
         Loop8SDK.shared.configure(config: SDKConfig(
             clientId: "YOUR_CLIENT_ID",
-            redirectUri: "yourapp://callback",
-            authorityURL: URL(string: "https://auth.l8p8.com")!,
-            scopes: ["openid"]
+            redirectUri: "yourapp://callback"
         ))
 
-        // Optional: react when the session expires
+        // Optional: called when the user's session expires and cannot be
+        // silently refreshed. Use this to navigate the user back to the login screen.
         Loop8SDK.shared.onSessionExpired = {
-            // Show login screen or notify the user
+            // Navigate to login screen
         }
     }
 
@@ -68,18 +68,58 @@ struct MyApp: App {
 }
 ```
 
+#### UIKit / AppDelegate
+
+If your app uses UIKit with an `AppDelegate`, configure the SDK in `didFinishLaunchingWithOptions`. Deep link handling is also done directly in `AppDelegate` via `application(_:open:options:)` — no additional setup is needed elsewhere.
+
+```swift
+import UIKit
+import Loop8AuthSDK
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        Loop8SDK.shared.configure(config: SDKConfig(
+            clientId: "YOUR_CLIENT_ID",
+            redirectUri: "yourapp://callback"
+        ))
+
+        // Optional: called when the user's session expires and cannot be
+        // silently refreshed. Use this to navigate the user back to the login screen.
+        Loop8SDK.shared.onSessionExpired = {
+            // Navigate to login screen
+        }
+
+        return true
+    }
+
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+    ) -> Bool {
+        Loop8SDK.shared.handleRedirect(url: url)
+        return true
+    }
+}
+```
+
 | Parameter | Description |
 |---|---|
 | `clientId` | Your app's client ID, provided by Loop8 |
 | `redirectUri` | Must match the URL scheme registered in `Info.plist` |
-| `authorityURL` | The Loop8 authorization server URL |
-| `scopes` | At minimum `["openid"]` |
 
 ---
 
 ## 3. Handle the login callback
 
 After the user authenticates in the Loop8 app, iOS redirects back to your app via a deep link. You must forward that URL to the SDK.
+
+#### SwiftUI
 
 ```swift
 var body: some Scene {
@@ -92,11 +132,15 @@ var body: some Scene {
 }
 ```
 
+#### UIKit / AppDelegate
+
+The callback is already handled in `AppDelegate.application(_:open:options:)` shown above.
+
 ---
 
 ## 4. Add the login button
 
-Place `Loop8LoginButton` anywhere in your SwiftUI view hierarchy.
+Place `Loop8LoginButton` anywhere in your SwiftUI view hierarchy. The button appearance is fully managed by the SDK and cannot be customized.
 
 ```swift
 import SwiftUI
@@ -112,7 +156,6 @@ struct ContentView: View {
                 Text("Authenticated")
             } else {
                 Loop8LoginButton(
-                    title: "Continue with Loop8",
                     onSuccess: { result in
                         // result.accessToken
                         // result.idToken
@@ -132,28 +175,7 @@ struct ContentView: View {
 
 ---
 
-## 5. Handle logout
-
-```swift
-Loop8SDK.shared.logout { result in
-    switch result {
-    case .success:
-        // Clear local state, navigate to login screen
-    case .failure(let error):
-        print("Logout error: \(error.localizedDescription)")
-    }
-}
-```
-
-To clear the local session immediately without a network call:
-
-```swift
-Loop8SDK.shared.resetSession()
-```
-
----
-
-## 6. Required Info.plist settings
+## 5. Required Info.plist settings
 
 Add the following to your app's `Info.plist`. Replace `yourapp` with the custom URL scheme you chose for `redirectUri`.
 
@@ -178,7 +200,7 @@ Add the following to your app's `Info.plist`. Replace `yourapp` with the custom 
 
 ---
 
-## 7. Example app
+## 6. Example app
 
 A full working example is included in the [`Example/`](./Example) folder.
 
@@ -188,4 +210,4 @@ To run it:
 2. Select a simulator or device
 3. Build and run
 
-The example app demonstrates configuration, the login button, callback handling, logout, and session reset.
+The example app demonstrates configuration, the login button, and callback handling.
