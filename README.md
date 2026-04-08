@@ -157,9 +157,7 @@ struct ContentView: View {
             } else {
                 Loop8LoginButton(
                     onSuccess: { result in
-                        // result.accessToken
                         // result.idToken
-                        // result.claims
                         isAuthenticated = true
                     },
                     onFailure: { error in
