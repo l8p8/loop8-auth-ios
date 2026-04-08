@@ -363,7 +363,7 @@
 			repositoryURL = "https://github.com/l8p8/loop8-auth-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 0.1.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
