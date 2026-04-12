@@ -49,7 +49,7 @@ struct ContentView: View {
 				Spacer()
 
 				if isAuthenticated {
-					Button("Reset Session") {
+					Button("Logout") {
 						Loop8SDK.shared.resetSession()
 						withAnimation(.easeInOut(duration: 0.2)) {
 							isAuthenticated = false
@@ -97,6 +97,10 @@ struct ContentView: View {
 					.scaleEffect(1.5)
 					.tint(.white)
 			}
+		}
+		.onAppear {
+			isAuthenticated = Loop8SDK.shared.isAuthenticated
+			status = isAuthenticated ? "Authenticated" : "Not authenticated"
 		}
 	}
 }

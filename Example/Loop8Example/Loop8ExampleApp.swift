@@ -13,7 +13,7 @@ struct Loop8ExampleApp: App {
 
 	init() {
 		_ = Loop8SDK.shared.configure(config: SDKConfig(
-			clientId: "I7S283JLR89WBTGG",
+			clientId: "YOUR_CLIENT_ID",
 			redirectUri: "loop8example://callback"
 		))
 		Loop8SDK.shared.onSessionExpired = {
